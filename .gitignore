@@ -1,0 +1,26 @@
+# Development
+develop.txt
+demo_*
+tmp*
+
+# Directories
+.vscode/
+__pycache__/
+*.egg-info/
+tmp/
+logs/
+wandb/
+artifacts/
+benchmark/
+results/
+data/alex_mp_20/
+ckpts/
+outputs/
+
+# File format
+*.qsub*
+*.log
+*.out
+*.env
+*.sh
+*.tar.gz

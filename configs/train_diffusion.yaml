@@ -1,0 +1,8 @@
+diffusion_module:
+  num_timesteps: 256
+  beta_schedule_ddpm: cosine
+  beta_schedule_d3pm: reciprocal
+  max_atoms: 100
+  d3pm_hybrid_coeff: 0.1
+  sigma_begin: 0.005
+  sigma_end: 0.5
