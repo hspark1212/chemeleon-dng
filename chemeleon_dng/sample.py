@@ -6,8 +6,8 @@ It supports three types of tasks:
 - GUIDE (Guiding Generation): Generates structures with guidance
 """
 
-from pathlib import Path
 import json
+from pathlib import Path
 import fire
 import numpy as np
 from pymatgen.core import Composition, Structure
@@ -108,7 +108,7 @@ def sample(
     task: str,
     num_samples: int = 100,
     batch_size: int | None = None,
-    formulas: str | tuple | None = None,  # Only for CSP task
+    formulas: str | tuple | list | None = None,  # Only for CSP task
     num_atom_distribution: str | list[int] | None = "mp-20",  # Only for DNG task
     model_path: str | None = None,
     output_dir: str = "./results",
@@ -140,22 +140,24 @@ def sample(
     Examples\n
     --------\n
     # CSP: Generate 100 samples each for NaCl, OCl3, and UO15 formulas, processing 150 samples at a time
-    >>> python scripts/sample.py --task=csp --formulas="NaCl, OCl3, UO15" --num_samples=100 --batch_size=150 --output_dir="./results"
+    >>> sample(task="csp", formulas="NaCl, OCl3, UO15", num_samples=100, batch_size=150, output_dir="./results")
+    or
+    >>> sample(task="csp", formulas=["NaCl", "OCl3", "UO15"], num_samples=100, batch_size=150, output_dir="./results")
 
     # CSP: Generate 100 samples for a single formula at a time
-    >>> python scripts/sample.py --task=csp --formulas="SiO2" --num_samples=100
+    >>> sample(task="csp", formulas="SiO2", num_samples=100)
 
     # DNG: Generate 100 samples with specific atom counts [7,8]
-    >>> python scripts/sample.py --task=dng --num_atom_distribution=[7, 8] --num_samples=100
+    >>> sample(task="dng", num_atom_distribution=[7, 8] * 50, num_samples=100)
 
     # DNG: Generate 100 samples using the 'mp-20' atom distribution
-    >>> python scripts/sample.py --task=dng --num_samples=100 --batch_size=50
+    >>> sample(task="dng", num_samples=100)
 
     # Using a custom checkpoint path
-    >>> python scripts/sample.py --task=csp --formulas="NaCl" --model_path="path/to/custom/checkpoint.ckpt"
+    >>> sample(task="csp", formulas="NaCl", model_path="path/to/custom/checkpoint.ckpt")
 
     # Explicitly specify device
-    >>> python scripts/sample.py --task=dng --device="cpu" --num_samples=5
+    >>> sample(task="dng", device="cpu", num_samples=5)
     """
     # Set device
     if device is None:
@@ -183,14 +185,23 @@ def sample(
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
     print(f"The generated structures will be saved in: {output_path}")
+    existing_files = list(output_path.glob("sample_*.cif"))
+    if existing_files:
+        print(
+            f"Warning: {len(existing_files)} existing CIF files found in the output directory."
+            " Recommend emptying the directory before sampling to avoid overwriting."
+        )
 
     # Validate task
     task = task.lower()
     if task == "csp":
         assert formulas is not None, "Formulas must be provided for CSP task."
-        if isinstance(formulas, str) and formulas.endswith(".json"):
-            with open(formulas, "r") as f:
-                formulas = json.load(f)
+        if isinstance(formulas, str):
+            if formulas.endswith(".json"):
+                with open(formulas, "r") as f:
+                    formulas = json.load(f)
+            else:
+                formulas = tuple(formulas.split(","))
         sample_csp(
             dm=dm,
             formulas=formulas,

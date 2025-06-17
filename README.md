@@ -29,8 +29,24 @@ pip install -e .
 
 Generate crystal structures for given chemical formulas:
 
+```python
+from chemeleon_dng.sample import sample
+
+sample(
+    task="csp",
+    formulas=["NaCl", "LiMnO2"],
+    num_samples=10,
+    output_dir="results",
+    device="cpu"
+)
+```
+
+[!TIP]: Invoke help(sample) to explore all available parameters and usage examples.
+
+For the command line interface, you can use the following command:
+
 ```bash
-python scripts/sample.py --task=csp --formulas="NaCl,LiMnO2" --num_samples=10 --output_dir="results" --device=cpu
+python chemeleon_dng/sample.py --task=csp --formulas="NaCl,LiMnO2" --num_samples=10 --output_dir="results" --device=cpu
 ```
 
 This command generates 10 crystal structures for the given formulas using the CSP task and saves the CIF files of the generated structures in the `results/` directory using CPU.
@@ -38,6 +54,20 @@ This command generates 10 crystal structures for the given formulas using the CS
 ### De Novo Generation (DNG)
 
 Generate novel crystal structures without predefined compositions:
+
+```python
+from chemeleon_dng.sample import sample
+
+sample(
+    task="dng",
+    num_samples=200,
+    batch_size=100,
+    output_dir="results",
+    device="cuda"
+)
+```
+
+For the command line interface, you can use the following command:
 
 ```bash
 python scripts/sample.py --task=dng --num_samples=200 --batch_size=100 --output_dir="results" --device=cuda
