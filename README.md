@@ -42,7 +42,7 @@ sample(
 ```
 
 > [!TIP]
-> Invoke help(sample) to explore all available parameters and usage examples.
+> Invoke `help(sample)` to explore all available parameters and usage examples.
 
 For the command line interface, you can use the following command:
 
